@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JSX Demo Calculator</title>
+  <meta charset="utf-8" />
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="react/react.js"></script>
+  <script src="react/react-dom.js"></script>
+  <script src="react/babel.js"></script>
+  <script type="text/babel">
+
+    function Calculator({ start }) {
+      const [value, setValue] = React.useState(start);
+      const [input, setInput] = React.useState('');
+
+      const handleOperation = (operation) => {
+        const num = parseFloat(input);
+        if (!isNaN(num)) {
+          switch (operation) {
+            case 'add':
+              setValue((prev) => prev + num);
+              break;
+            case 'subtract':
+              setValue((prev) => prev - num);
+              break;
+            case 'multiply':
+              setValue((prev) => prev * num);
+              break;
+            case 'divide':
+              if (num !== 0) {
+                setValue((prev) => prev / num);
+              } else {
+                alert('Cannot divide by zero!');
+              }
+              break;
+            default:
+              break;
+          }
+          setInput('');
+        }
+      };
+
+      return (
+        <main style={{ border: '1px solid #ccc', padding: '20px', margin: '10px', borderRadius: '5px' }}>
+          <p>Current Value: <strong>{value}</strong></p>
+          <div>
+            <input
+              type="number"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Enter number"
+              style={{ padding: '5px', margin: '5px' }}
+            />
+          </div>
+          <div>
+            <button onClick={() => handleOperation('add')} style={{ margin: '5px', padding: '8px 15px' }}>
+              Add (+)
+            </button>
+            <button onClick={() => handleOperation('subtract')} style={{ margin: '5px', padding: '8px 15px' }}>
+              Subtract (-)
+            </button>
+            <button onClick={() => handleOperation('multiply')} style={{ margin: '5px', padding: '8px 15px' }}>
+              Multiply (×)
+            </button>
+            <button onClick={() => handleOperation('divide')} style={{ margin: '5px', padding: '8px 15px' }}>
+              Divide (÷)
+            </button>
+          </div>
+          <button onClick={() => setValue(start)} style={{ margin: '5px', padding: '8px 15px' }}>
+            Reset
+          </button>
+        </main>
+      );
+    }
+
+    function App() {
+      return (
+        <div>
+          <Calculator start={0} />
+          <Calculator start={10} />
+          <Calculator start={100} />
+        </div>
+      );
+    }
+
+    const root = ReactDOM.render(<App />, document.getElementById("root"));
+
+    root.render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    );
+
+  </script>
+</body>
+</html>
+
