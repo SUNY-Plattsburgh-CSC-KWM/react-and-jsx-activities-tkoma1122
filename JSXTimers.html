@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>JSX Demo Timer</title>
+  <title>JSX Demo Kitchen Timer</title>
   <meta charset="utf-8" />
 </head>
 <body>
@@ -12,47 +12,107 @@
   <script src="react/babel.js"></script>
   <script type="text/babel">
 
-    function Counter({ start }) {
+    function KitchenTimer({ start, title: initialTitle, speed: initialSpeed }) {
         const [counter, setCounter] = React.useState(start);
+        const [title, setTitle] = React.useState(initialTitle);
+        const [speed, setSpeed] = React.useState(initialSpeed);
+        const [isEditingTitle, setIsEditingTitle] = React.useState(false);
+        const [tempTitle, setTempTitle] = React.useState(initialTitle);
 
-	React.useEffect(() => {
+        // Speed options: milliseconds per tick
+        const speedOptions = {
+            'tenths': 100,      // 0.1 seconds
+            'seconds': 1000,    // 1 second
+            'minutes': 60000    // 60 seconds
+        };
+
+        React.useEffect(() => {
             const tickTock = () => {
-		setCounter((value) => value + 1);
+                setCounter((value) => value + 1);
             }
-	    
-            const timer = setInterval(tickTock, 1000);
+            
+            const interval = speedOptions[speed] || speedOptions['seconds'];
+            const timer = setInterval(tickTock, interval);
 
-	    return () => {
-		clearInterval(timer);
-	    };
+            return () => {
+                clearInterval(timer);
+            };
 
-	}, []);  // [] tells it to only run once
+        }, [speed]);  // Re-run when speed changes
 	    
+        const handleTitleSave = () => {
+            setTitle(tempTitle);
+            setIsEditingTitle(false);
+        };
+
+        const handleTitleCancel = () => {
+            setTempTitle(title);
+            setIsEditingTitle(false);
+        };
+
         return (
-	   <main>
-	      <p>Counter: {counter}</p>
-		<button onClick={() => setCounter(0)}>
-	          Reset
-              </button>
-	   </main>
-	);
+            <main style={{ border: '1px solid #ccc', padding: '20px', margin: '10px', borderRadius: '5px' }}>
+                {isEditingTitle ? (
+                    <div>
+                        <input
+                            type="text"
+                            value={tempTitle}
+                            onChange={(e) => setTempTitle(e.target.value)}
+                            onKeyPress={(e) => {
+                                if (e.key === 'Enter') handleTitleSave();
+                                if (e.key === 'Escape') handleTitleCancel();
+                            }}
+                            style={{ padding: '5px', margin: '5px' }}
+                            autoFocus
+                        />
+                        <button onClick={handleTitleSave} style={{ margin: '5px', padding: '5px 10px' }}>
+                            Save
+                        </button>
+                        <button onClick={handleTitleCancel} style={{ margin: '5px', padding: '5px 10px' }}>
+                            Cancel
+                        </button>
+                    </div>
+                ) : (
+                    <p>
+                        <strong onClick={() => setIsEditingTitle(true)} style={{ cursor: 'pointer' }}>
+                            {title}: {counter}
+                        </strong>
+                    </p>
+                )}
+                <div>
+                    <label>Speed: </label>
+                    <select 
+                        value={speed} 
+                        onChange={(e) => setSpeed(e.target.value)}
+                        style={{ padding: '5px', margin: '5px' }}
+                    >
+                        <option value="tenths">Tenths of a second</option>
+                        <option value="seconds">Seconds</option>
+                        <option value="minutes">Minutes</option>
+                    </select>
+                </div>
+                <button onClick={() => setCounter(start)} style={{ margin: '5px', padding: '8px 15px' }}>
+                    Reset
+                </button>
+            </main>
+        );
     }
 
     function App() {
       return (
         <div>
-          <Counter start={0} />
-          <Counter start={123} />
-          <Counter start={-64} />
+          <KitchenTimer start={0} title="Egg Timer" speed="seconds" />
+          <KitchenTimer start={0} title="Baking Timer" speed="minutes" />
+          <KitchenTimer start={0} title="Quick Timer" speed="tenths" />
         </div>
       );
     }
 
     ReactDOM.render(
-	    <React.StrictMode>
+        <React.StrictMode>
             <App />
-	    </React.StrictMode>,
-	document.getElementById("root")
+        </React.StrictMode>,
+        document.getElementById("root")
     );
 
   </script>
